@@ -9,7 +9,7 @@ import (
 
 	"github.com/gofrs/uuid"
 
-	logadapter "github.com/StevenACoffman/logrus-stackdriver-formatter"
+	logadapter "github.com/Mattel/logrus-stackdriver-formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/trace"
@@ -29,7 +29,7 @@ func TestFormatter(t *testing.T) {
 				logadapter.WithVersion("0.1"),
 				logadapter.WithSkipTimestamp(),
 				logadapter.WithSourceReference(
-					"https://github.com/StevenACoffman/test.git",
+					"https://github.com/Mattel/test.git",
 					"v1.2.3",
 				),
 				logadapter.WithGlobalTraceID(TraceID),
@@ -50,8 +50,8 @@ var (
 	TraceID     = uuid.Must(uuid.FromString("105445aa7843bc8bf206b12000100000"))
 	SpanID      = [8]byte{0, 0, 0, 0, 0, 0, 0, 1}
 	SpanContext = trace.SpanContext{}.WithSpanID(SpanID).
-			WithTraceID(trace.TraceID(TraceID)).
-			WithTraceFlags(TraceFlags)
+		WithTraceID(trace.TraceID(TraceID)).
+		WithTraceFlags(TraceFlags)
 	LineNumber = platformLine()
 )
 
@@ -115,7 +115,7 @@ var formatterTests = []struct {
 				},
 				"sourceReferences": []map[string]interface{}{
 					{
-						"repository": "https://github.com/StevenACoffman/test.git",
+						"repository": "https://github.com/Mattel/test.git",
 						"revisionId": "v1.2.3",
 					},
 				},
@@ -161,7 +161,7 @@ var formatterTests = []struct {
 				},
 				"sourceReferences": []map[string]interface{}{
 					{
-						"repository": "https://github.com/StevenACoffman/test.git",
+						"repository": "https://github.com/Mattel/test.git",
 						"revisionId": "v1.2.3",
 					},
 				},
@@ -218,7 +218,7 @@ var formatterTests = []struct {
 				},
 				"sourceReferences": []map[string]interface{}{
 					{
-						"repository": "https://github.com/StevenACoffman/test.git",
+						"repository": "https://github.com/Mattel/test.git",
 						"revisionId": "v1.2.3",
 					},
 				},

@@ -11,7 +11,7 @@ import (
 	"github.com/gofrs/uuid"
 	"go.opentelemetry.io/otel/trace"
 
-	stackdriver "github.com/StevenACoffman/logrus-stackdriver-formatter"
+	stackdriver "github.com/Mattel/logrus-stackdriver-formatter"
 	"github.com/sirupsen/logrus"
 )
 

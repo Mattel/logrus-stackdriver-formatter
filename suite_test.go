@@ -10,8 +10,8 @@ import (
 	"os"
 	"testing"
 
-	logadapter "github.com/StevenACoffman/logrus-stackdriver-formatter"
-	"github.com/StevenACoffman/logrus-stackdriver-formatter/ctxlogrus"
+	logadapter "github.com/Mattel/logrus-stackdriver-formatter"
+	"github.com/Mattel/logrus-stackdriver-formatter/ctxlogrus"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_testing "github.com/grpc-ecosystem/go-grpc-middleware/testing"
 	pb_testproto "github.com/grpc-ecosystem/go-grpc-middleware/testing/testproto"
@@ -37,7 +37,7 @@ func newGRPCTestSuite(t *testing.T) *grpcTestSuite {
 		logadapter.WithVersion("v1.0.0"),
 		logadapter.WithStackTraceStyle(logadapter.TraceInPayload),
 		logadapter.WithSourceReference(
-			"github.com/StevenACoffman/logrus-stackdriver-formatter",
+			"github.com/Mattel/logrus-stackdriver-formatter",
 			"v1.0.0",
 		),
 		logadapter.WithPrettyPrint(),
@@ -159,7 +159,7 @@ func newHTTPTestSuite(t *testing.T) *httpTestSuite {
 		logadapter.WithVersion("v1.0.0"),
 		logadapter.WithStackTraceStyle(logadapter.TraceInPayload),
 		logadapter.WithSourceReference(
-			"github.com/StevenACoffman/logrus-stackdriver-formatter",
+			"github.com/Mattel/logrus-stackdriver-formatter",
 			"v1.0.0",
 		),
 		logadapter.WithPrettyPrint(),

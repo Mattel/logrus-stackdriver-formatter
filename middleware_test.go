@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	logadapter "github.com/StevenACoffman/logrus-stackdriver-formatter"
+	logadapter "github.com/Mattel/logrus-stackdriver-formatter"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	pb_testproto "github.com/grpc-ecosystem/go-grpc-middleware/testing/testproto"
 	"github.com/sirupsen/logrus"

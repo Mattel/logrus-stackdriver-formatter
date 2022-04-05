@@ -6,7 +6,7 @@ import (
 	"net"
 	"testing"
 
-	logadapter "github.com/StevenACoffman/logrus-stackdriver-formatter"
+	logadapter "github.com/Mattel/logrus-stackdriver-formatter"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/interop"

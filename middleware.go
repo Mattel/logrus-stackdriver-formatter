@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/StevenACoffman/logrus-stackdriver-formatter/ctxlogrus"
+	"github.com/Mattel/logrus-stackdriver-formatter/ctxlogrus"
 	"github.com/felixge/httpsnoop"
 	"github.com/gofrs/uuid"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"

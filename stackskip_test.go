@@ -9,7 +9,7 @@ import (
 	"github.com/gofrs/uuid"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/StevenACoffman/logrus-stackdriver-formatter/test"
+	"github.com/Mattel/logrus-stackdriver-formatter/test"
 	"github.com/google/go-cmp/cmp"
 	"github.com/sirupsen/logrus"
 )
@@ -19,8 +19,8 @@ var (
 	TraceID     = uuid.Must(uuid.FromString("105445aa7843bc8bf206b12000100000"))
 	SpanID      = [8]byte{0, 0, 0, 0, 0, 0, 0, 1}
 	SpanContext = trace.SpanContext{}.WithSpanID(SpanID).
-		WithTraceID(trace.TraceID(TraceID)).
-		WithTraceFlags(TraceFlags)
+			WithTraceID(trace.TraceID(TraceID)).
+			WithTraceFlags(TraceFlags)
 	LineNumber = platformLine()
 )
 
@@ -33,7 +33,7 @@ func TestStackSkip(t *testing.T) {
 		WithProjectID("test-project"),
 		WithService("test"),
 		WithVersion("0.1"),
-		WithStackSkip("github.com/StevenACoffman/logrus-stackdriver-formatter"),
+		WithStackSkip("github.com/Mattel/logrus-stackdriver-formatter"),
 		WithSkipTimestamp(),
 		WithGlobalTraceID(TraceID),
 	)

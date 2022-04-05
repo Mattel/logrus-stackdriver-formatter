@@ -137,7 +137,7 @@ func NewFormatter(options ...Option) *Formatter {
 	fmtr := Formatter{
 		StackSkip: []string{
 			"github.com/sirupsen/logrus",
-			"github.com/StevenACoffman/logrus-stackdriver-formatter",
+			"github.com/Mattel/logrus-stackdriver-formatter",
 			"github.com/grpc-ecosystem/go-grpc-middleware",
 			"go.opentelemetry.io",
 		},
