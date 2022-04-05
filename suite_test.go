@@ -36,7 +36,10 @@ func newGRPCTestSuite(t *testing.T) *grpcTestSuite {
 		logadapter.WithService("logging-test"),
 		logadapter.WithVersion("v1.0.0"),
 		logadapter.WithStackTraceStyle(logadapter.TraceInPayload),
-		logadapter.WithSourceReference("github.com/Mattel/logrus-stackdriver-formatter", "v1.0.0"),
+		logadapter.WithSourceReference(
+			"github.com/Mattel/logrus-stackdriver-formatter",
+			"v1.0.0",
+		),
 		logadapter.WithPrettyPrint(),
 	)
 	var out io.Writer
@@ -68,7 +71,10 @@ type loggingPingService struct {
 	pb_testproto.TestServiceServer
 }
 
-func (s *loggingPingService) Ping(ctx context.Context, ping *pb_testproto.PingRequest) (*pb_testproto.PingResponse, error) {
+func (s *loggingPingService) Ping(
+	ctx context.Context,
+	ping *pb_testproto.PingRequest,
+) (*pb_testproto.PingResponse, error) {
 	grpc_ctxtags.Extract(ctx).Set("custom_tags.string", "something").Set("custom_tags.int", 1337)
 	ctxlogrus.AddFields(ctx, logrus.Fields{"custom_field": "custom_value"})
 	ctxlogrus.Extract(ctx).Info("some ping")
@@ -78,7 +84,10 @@ func (s *loggingPingService) Ping(ctx context.Context, ping *pb_testproto.PingRe
 	return s.TestServiceServer.Ping(ctx, ping)
 }
 
-func (s *loggingPingService) PingError(ctx context.Context, ping *pb_testproto.PingRequest) (*pb_testproto.Empty, error) {
+func (s *loggingPingService) PingError(
+	ctx context.Context,
+	ping *pb_testproto.PingRequest,
+) (*pb_testproto.Empty, error) {
 	empty, err := s.TestServiceServer.PingError(ctx, ping)
 
 	if ping.Value == "stack" {
@@ -89,14 +98,22 @@ func (s *loggingPingService) PingError(ctx context.Context, ping *pb_testproto.P
 	return empty, err
 }
 
-func (s *loggingPingService) PingList(ping *pb_testproto.PingRequest, stream pb_testproto.TestService_PingListServer) error {
-	grpc_ctxtags.Extract(stream.Context()).Set("custom_tags.string", "something").Set("custom_tags.int", 1337)
+func (s *loggingPingService) PingList(
+	ping *pb_testproto.PingRequest,
+	stream pb_testproto.TestService_PingListServer,
+) error {
+	grpc_ctxtags.Extract(stream.Context()).
+		Set("custom_tags.string", "something").
+		Set("custom_tags.int", 1337)
 	ctxlogrus.AddFields(stream.Context(), logrus.Fields{"custom_field": "custom_value"})
 	ctxlogrus.Extract(stream.Context()).Info("some pinglist")
 	return s.TestServiceServer.PingList(ping, stream)
 }
 
-func (s *loggingPingService) PingEmpty(ctx context.Context, empty *pb_testproto.Empty) (*pb_testproto.PingResponse, error) {
+func (s *loggingPingService) PingEmpty(
+	ctx context.Context,
+	empty *pb_testproto.Empty,
+) (*pb_testproto.PingResponse, error) {
 	return s.TestServiceServer.PingEmpty(ctx, empty)
 }
 
@@ -141,7 +158,10 @@ func newHTTPTestSuite(t *testing.T) *httpTestSuite {
 		logadapter.WithService("logging-test"),
 		logadapter.WithVersion("v1.0.0"),
 		logadapter.WithStackTraceStyle(logadapter.TraceInPayload),
-		logadapter.WithSourceReference("github.com/Mattel/logrus-stackdriver-formatter", "v1.0.0"),
+		logadapter.WithSourceReference(
+			"github.com/Mattel/logrus-stackdriver-formatter",
+			"v1.0.0",
+		),
 		logadapter.WithPrettyPrint(),
 	)
 	var out io.Writer

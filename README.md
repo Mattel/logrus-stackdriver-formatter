@@ -1,8 +1,8 @@
 # logrus-stackdriver-formatter
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/StevenACoffman/logrus-stackdriver-formatter)](https://goreportcard.com/report/github.com/StevenACoffman/logrus-stackdriver-formatter)
-[![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/StevenACoffman/logrus-stackdriver-formatter)
-[![License MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/StevenACoffman/logrus-stackdriver-formatter#license)
+[![Go Report Card](https://goreportcard.com/badge/github.com/Mattel/logrus-stackdriver-formatter)](https://goreportcard.com/report/github.com/Mattel/logrus-stackdriver-formatter)
+[![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/Mattel/logrus-stackdriver-formatter)
+[![License MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/Mattel/logrus-stackdriver-formatter#license)
 
 Logrus-stackdriver-formatter provides:
 + [logrus](https://github.com/sirupsen/logrus) formatter for Stackdriver.
@@ -23,7 +23,7 @@ package main
 
 import (
 
-stackdriver "github.com/StevenACoffman/logrus-stackdriver-formatter"
+stackdriver "github.com/Mattel/logrus-stackdriver-formatter"
 "github.com/sirupsen/logrus"
 )
 
@@ -52,7 +52,7 @@ Here's a sample entry (prettified) from the example:
   "severity": "ERROR",
   "context": {
     "reportLocation": {
-      "file": "github.com/StevenACoffman/logrus-stackdriver-formatter/example_test.go",
+      "file": "github.com/Mattel/logrus-stackdriver-formatter/example_test.go",
       "line": 21,
       "function": "ExampleLogError"
     }
@@ -99,7 +99,7 @@ and log-structured data streams.
 ```go
 import (
 	"os"
-	logadapter "github.com/StevenACoffman/logrus-stackdriver-formatter"
+	logadapter "github.com/Mattel/logrus-stackdriver-formatter"
 	kitlog "github.com/go-kit/kit/log"
 )
 
@@ -118,7 +118,7 @@ func main() {
 ```go
 import (
 	"os"
-	logadapter "github.com/StevenACoffman/logrus-stackdriver-formatter"
+	logadapter "github.com/Mattel/logrus-stackdriver-formatter"
 	kitlog "github.com/go-kit/kit/log"
 )
 

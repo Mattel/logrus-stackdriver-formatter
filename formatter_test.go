@@ -4,11 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"runtime"
 	"testing"
+
+	"github.com/gofrs/uuid"
 
 	logadapter "github.com/Mattel/logrus-stackdriver-formatter"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func TestFormatter(t *testing.T) {
@@ -28,8 +32,8 @@ func TestFormatter(t *testing.T) {
 					"https://github.com/Mattel/test.git",
 					"v1.2.3",
 				),
+				logadapter.WithGlobalTraceID(TraceID),
 			)
-
 			tt.run(logger)
 
 			got, err := json.Marshal(tt.out)
@@ -41,6 +45,16 @@ func TestFormatter(t *testing.T) {
 	}
 }
 
+var (
+	TraceFlags  = trace.FlagsSampled
+	TraceID     = uuid.Must(uuid.FromString("105445aa7843bc8bf206b12000100000"))
+	SpanID      = [8]byte{0, 0, 0, 0, 0, 0, 0, 1}
+	SpanContext = trace.SpanContext{}.WithSpanID(SpanID).
+		WithTraceID(trace.TraceID(TraceID)).
+		WithTraceFlags(TraceFlags)
+	LineNumber = platformLine()
+)
+
 var formatterTests = []struct {
 	run  func(*logrus.Logger)
 	out  map[string]interface{}
@@ -51,7 +65,7 @@ var formatterTests = []struct {
 		run: func(logger *logrus.Logger) {
 			logger.
 				WithField("foo", "bar").
-				WithField("trace", "105445aa7843bc8bf206b12000100000/1;o=1").
+				WithField("span_context", SpanContext).
 				Info("my log entry")
 		},
 		out: map[string]interface{}{
@@ -59,18 +73,18 @@ var formatterTests = []struct {
 			"message":  "my log entry",
 			"logName":  "projects/test-project/logs/test",
 
-			"logging.googleapis.com/trace":        "projects/test-project/traces/105445aa7843bc8bf206b12000100000",
-			"logging.googleapis.com/spanId":       "1",
-			"logging.googleapis.com/traceSampled": true,
+			"logging.googleapis.com/trace":         "projects/test-project/traces/105445aa7843bc8bf206b12000100000",
+			"logging.googleapis.com/spanId":        "0000000000000001",
+			"logging.googleapis.com/trace_sampled": true,
 			"context": map[string]interface{}{
 				"data": map[string]interface{}{
 					"foo": "bar",
 				},
 			},
-			"sourceLocation": map[string]interface{}{
+			"logging.googleapis.com/sourceLocation": map[string]interface{}{
 				"file":     "testing/testing.go",
 				"function": "tRunner",
-				"line":     1194.0,
+				"line":     LineNumber,
 			},
 		},
 	},
@@ -79,7 +93,7 @@ var formatterTests = []struct {
 		run: func(logger *logrus.Logger) {
 			logger.
 				WithField("foo", "bar").
-				WithField("trace", "105445aa7843bc8bf206b12000100000/1;o=1").
+				WithField("span_context", SpanContext).
 				Error("my log entry")
 		},
 		out: map[string]interface{}{
@@ -88,9 +102,9 @@ var formatterTests = []struct {
 			"message":  "my log entry",
 			"logName":  "projects/test-project/logs/test",
 
-			"logging.googleapis.com/trace":        "projects/test-project/traces/105445aa7843bc8bf206b12000100000",
-			"logging.googleapis.com/spanId":       "1",
-			"logging.googleapis.com/traceSampled": true,
+			"logging.googleapis.com/trace":         "projects/test-project/traces/105445aa7843bc8bf206b12000100000",
+			"logging.googleapis.com/spanId":        "0000000000000001",
+			"logging.googleapis.com/trace_sampled": true,
 			"serviceContext": map[string]interface{}{
 				"service": "test",
 				"version": "0.1",
@@ -107,13 +121,13 @@ var formatterTests = []struct {
 				},
 				"reportLocation": map[string]interface{}{
 					"filePath":     "testing/testing.go",
-					"lineNumber":   1194.0,
+					"lineNumber":   LineNumber,
 					"functionName": "tRunner",
 				},
 			},
-			"sourceLocation": map[string]interface{}{
+			"logging.googleapis.com/sourceLocation": map[string]interface{}{
 				"file":     "testing/testing.go",
-				"line":     1194.0,
+				"line":     LineNumber,
 				"function": "tRunner",
 			},
 		},
@@ -123,7 +137,7 @@ var formatterTests = []struct {
 		run: func(logger *logrus.Logger) {
 			logger.
 				WithField("foo", "bar").
-				WithField("trace", "105445aa7843bc8bf206b12000100000/1;o=1").
+				WithField("span_context", SpanContext).
 				WithError(errors.New("test error")).
 				Error("my log entry")
 		},
@@ -133,9 +147,9 @@ var formatterTests = []struct {
 			"message":  "my log entry\ntest error",
 			"logName":  "projects/test-project/logs/test",
 
-			"logging.googleapis.com/trace":        "projects/test-project/traces/105445aa7843bc8bf206b12000100000",
-			"logging.googleapis.com/spanId":       "1",
-			"logging.googleapis.com/traceSampled": true,
+			"logging.googleapis.com/trace":         "projects/test-project/traces/105445aa7843bc8bf206b12000100000",
+			"logging.googleapis.com/spanId":        "0000000000000001",
+			"logging.googleapis.com/trace_sampled": true,
 			"serviceContext": map[string]interface{}{
 				"service": "test",
 				"version": "0.1",
@@ -153,13 +167,13 @@ var formatterTests = []struct {
 				},
 				"reportLocation": map[string]interface{}{
 					"filePath":     "testing/testing.go",
-					"lineNumber":   1194.0,
+					"lineNumber":   LineNumber,
 					"functionName": "tRunner",
 				},
 			},
-			"sourceLocation": map[string]interface{}{
+			"logging.googleapis.com/sourceLocation": map[string]interface{}{
 				"file":     "testing/testing.go",
-				"line":     1194.0,
+				"line":     LineNumber,
 				"function": "tRunner",
 			},
 		},
@@ -169,8 +183,8 @@ var formatterTests = []struct {
 		run: func(logger *logrus.Logger) {
 			logger.
 				WithFields(logrus.Fields{
-					"foo":   "bar",
-					"trace": "105445aa7843bc8bf206b12000100000/1;o=1",
+					"foo":          "bar",
+					"span_context": SpanContext,
 					"httpRequest": map[string]interface{}{
 						"requestMethod": "GET",
 					},
@@ -183,9 +197,9 @@ var formatterTests = []struct {
 			"message":  "my log entry",
 			"logName":  "projects/test-project/logs/test",
 
-			"logging.googleapis.com/trace":        "projects/test-project/traces/105445aa7843bc8bf206b12000100000",
-			"logging.googleapis.com/spanId":       "1",
-			"logging.googleapis.com/traceSampled": true,
+			"logging.googleapis.com/trace":         "projects/test-project/traces/105445aa7843bc8bf206b12000100000",
+			"logging.googleapis.com/spanId":        "0000000000000001",
+			"logging.googleapis.com/trace_sampled": true,
 			"serviceContext": map[string]interface{}{
 				"service": "test",
 				"version": "0.1",
@@ -199,7 +213,7 @@ var formatterTests = []struct {
 				},
 				"reportLocation": map[string]interface{}{
 					"filePath":     "testing/testing.go",
-					"lineNumber":   1194.0,
+					"lineNumber":   LineNumber,
 					"functionName": "tRunner",
 				},
 				"sourceReferences": []map[string]interface{}{
@@ -209,11 +223,22 @@ var formatterTests = []struct {
 					},
 				},
 			},
-			"sourceLocation": map[string]interface{}{
+			"logging.googleapis.com/sourceLocation": map[string]interface{}{
 				"file":     "testing/testing.go",
-				"line":     1194.0,
+				"line":     LineNumber,
 				"function": "tRunner",
 			},
 		},
 	},
+}
+
+func platformLine() float64 {
+	switch runtime.GOOS {
+	case "darwin":
+		return 1193.0
+	case "linux":
+		return 1439.0
+	default: // does anyone really use windows?
+		return 0.0
+	}
 }

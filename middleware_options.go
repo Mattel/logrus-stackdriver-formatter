@@ -73,7 +73,8 @@ func DefaultFilterRPC(_ context.Context, fullMethod string, _ error) bool {
 	}
 }
 
-// DefaultFilterHTTP filters health checks and monitoring canaries from some well known user agents or URL paths.
+// DefaultFilterHTTP filters health checks and monitoring canaries from some well known user agents
+// or URL paths.
 func DefaultFilterHTTP(r *http.Request) bool {
 	userAgent := r.Header.Get("User-Agent")
 	switch {

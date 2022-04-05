@@ -36,7 +36,10 @@ func extractStackFromError(err error) []byte {
 		fn := runtime.FuncForPC(pc)
 		if fn != nil {
 			file, line := fn.FileLine(pc)
-			lines = append(lines, fmt.Sprintf("%s()\n\t%s:%d +%#x", fn.Name(), file, line, fn.Entry()))
+			lines = append(
+				lines,
+				fmt.Sprintf("%s()\n\t%s:%d +%#x", fn.Name(), file, line, fn.Entry()),
+			)
 		}
 	}
 	buf.WriteString(strings.Join(lines, "\n"))

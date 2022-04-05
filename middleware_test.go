@@ -57,7 +57,11 @@ func (s *logFormatterSuite) TestPanic() {
 			reqID = ri.RequestId
 		}
 	}
-	assert.NotEmpty(s.T(), reqID, "panic in RPC returns a requestID to correlate logs back to client-reported error")
+	assert.NotEmpty(
+		s.T(),
+		reqID,
+		"panic in RPC returns a requestID to correlate logs back to client-reported error",
+	)
 
 	_ = s.getOutputJSONs()
 }
@@ -107,7 +111,8 @@ func (s *logFormatterSuite) TestError() {
 
 		if tcase.logError {
 			assert.Equal(s.T(), "ERROR", msgs[0]["severity"], "error is logged as error")
-			assert.Equal(s.T(),
+			assert.Equal(
+				s.T(),
 				"type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent",
 				msgs[0]["@type"],
 				"errors are typed to force Error Reporting parsing",

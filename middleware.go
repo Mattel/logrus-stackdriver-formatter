@@ -44,7 +44,10 @@ type requestDetails struct {
 
 // LoggingMiddleware proivdes a request-scoped log entry into context for HTTP
 // requests, writes request logs in a structured format to stackdriver.
-func LoggingMiddleware(log *logrus.Logger, opts ...MiddlewareOption) func(http.Handler) http.Handler {
+func LoggingMiddleware(
+	log *logrus.Logger,
+	opts ...MiddlewareOption,
+) func(http.Handler) http.Handler {
 	o := evaluateMiddlewareOptions(opts)
 
 	return func(handler http.Handler) http.Handler {
@@ -72,7 +75,9 @@ func LoggingMiddleware(log *logrus.Logger, opts ...MiddlewareOption) func(http.H
 
 			if o.filterHTTP(r) {
 				// log the result
-				ctxlogrus.Extract(ctx).WithField("httpRequest", requestDetails{request}).Infof("served HTTP %v %v", r.Method, r.URL)
+				ctxlogrus.Extract(ctx).
+					WithField("httpRequest", requestDetails{request}).
+					Infof("served HTTP %v %v", r.Method, r.URL)
 			}
 		})
 	}
@@ -81,7 +86,10 @@ func LoggingMiddleware(log *logrus.Logger, opts ...MiddlewareOption) func(http.H
 // UnaryLoggingInterceptor provides a request-scoped log entry into context for
 // Unary gRPC requests, and logs request details on the response.
 // Logging interceptors should be chained at the very top of the request scope.
-func UnaryLoggingInterceptor(logger *logrus.Logger, opts ...MiddlewareOption) grpc.UnaryServerInterceptor {
+func UnaryLoggingInterceptor(
+	logger *logrus.Logger,
+	opts ...MiddlewareOption,
+) grpc.UnaryServerInterceptor {
 	o := evaluateMiddlewareOptions(opts)
 	return loggingInterceptor{logger: logger, middlewareOptions: o}.intercept
 }
@@ -89,7 +97,10 @@ func UnaryLoggingInterceptor(logger *logrus.Logger, opts ...MiddlewareOption) gr
 // StreamLoggingInterceptor provides a request-scoped log entry into context for
 // Streaming gRPC requests, and logs request details at the end of the stream.
 // Logging interceptors should be chained at the very top of the request scope.
-func StreamLoggingInterceptor(logger *logrus.Logger, opts ...MiddlewareOption) grpc.StreamServerInterceptor {
+func StreamLoggingInterceptor(
+	logger *logrus.Logger,
+	opts ...MiddlewareOption,
+) grpc.StreamServerInterceptor {
 	o := evaluateMiddlewareOptions(opts)
 	return loggingInterceptor{logger: logger, middlewareOptions: o}.interceptStream
 }
@@ -108,7 +119,12 @@ type GRPCRequest struct {
 	Duration  string `json:"duration,omitempty"`
 }
 
-func (l loggingInterceptor) intercept(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func (l loggingInterceptor) intercept(
+	ctx context.Context,
+	req interface{},
+	info *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler,
+) (interface{}, error) {
 	startTime := time.Now()
 	ctx = WithLogger(ctx, l.logger)
 
@@ -123,7 +139,12 @@ func (l loggingInterceptor) intercept(ctx context.Context, req interface{}, info
 	return resp, err
 }
 
-func (l loggingInterceptor) interceptStream(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+func (l loggingInterceptor) interceptStream(
+	srv interface{},
+	ss grpc.ServerStream,
+	info *grpc.StreamServerInfo,
+	handler grpc.StreamHandler,
+) error {
 	startTime := time.Now()
 	ctx := WithLogger(ss.Context(), l.logger)
 
@@ -141,7 +162,8 @@ func (l loggingInterceptor) interceptStream(srv interface{}, ss grpc.ServerStrea
 	return err
 }
 
-// requestFromContext creates gRPC request details with information extracted from the request context
+// requestFromContext creates gRPC request details with information extracted from the request
+// context
 func (l *loggingInterceptor) requestFromContext(ctx context.Context, method string) *GRPCRequest {
 	request := &GRPCRequest{Method: method}
 
@@ -169,7 +191,12 @@ func (l *loggingInterceptor) requestFromContext(ctx context.Context, method stri
 // logStatus adds the gRPC Status to the log context.
 // If the response is an internal server error, log that as an Error
 // returns true if the logging was handled (e.g. internal server error)
-func (l *loggingInterceptor) log(ctx context.Context, err error, method string, request *GRPCRequest) {
+func (l *loggingInterceptor) log(
+	ctx context.Context,
+	err error,
+	method string,
+	request *GRPCRequest,
+) {
 	if !l.filterRPC(ctx, method, err) {
 		return
 	}
@@ -196,13 +223,18 @@ func (l *loggingInterceptor) log(ctx context.Context, err error, method string, 
 		},
 	}
 
-	// if we reach here, the response either wasn't a bad error worth handling (e.g. NotFound and its ilk)
+	// if we reach here, the response either wasn't a bad error worth handling (e.g. NotFound and
+	// its ilk)
 	ctxlogrus.Extract(ctx).WithField("httpRequest", httpReq).Infof("served RPC %v", method)
 }
 
 // handleError adds grpcStatus to logentry, and can handle our most egregious errors
 // returns true if the default Info logger should be skipped
-func (l *loggingInterceptor) handleError(ctx context.Context, err error, method string) (handled bool) {
+func (l *loggingInterceptor) handleError(
+	ctx context.Context,
+	err error,
+	method string,
+) (handled bool) {
 	if err == nil {
 		return false
 	}
@@ -261,7 +293,11 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
 			entry := ctxlogrus.Extract(ctx)
 
 			// write error back to client
-			jsonStatus, merr := protojson.MarshalOptions{EmitUnpopulated: true}.Marshal(stErr.Proto())
+			jsonStatus, merr := protojson.MarshalOptions{
+				EmitUnpopulated: true,
+			}.Marshal(
+				stErr.Proto(),
+			)
 			if merr != nil {
 				entry.WithError(merr).Errorf("error marshalling error status into log")
 				fmt.Fprint(w, `{"error": "server_error"}`)
@@ -280,7 +316,12 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
 
 // UnaryRecoveryInterceptor is an interceptor that recovers panics and turns them
 // into nicer GRPC errors.
-func UnaryRecoveryInterceptor(ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+func UnaryRecoveryInterceptor(
+	ctx context.Context,
+	req interface{},
+	_ *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler,
+) (resp interface{}, err error) {
 	defer func() {
 		e := recover()
 		if e == nil {
@@ -306,7 +347,12 @@ func UnaryRecoveryInterceptor(ctx context.Context, req interface{}, _ *grpc.Unar
 
 // StreamRecoveryInterceptor is an interceptor that recovers panics from
 // Streaming services and turns them into nicer gRPC errors.
-func StreamRecoveryInterceptor(srv interface{}, ss grpc.ServerStream, _ *grpc.StreamServerInfo, handler grpc.StreamHandler) (err error) {
+func StreamRecoveryInterceptor(
+	srv interface{},
+	ss grpc.ServerStream,
+	_ *grpc.StreamServerInfo,
+	handler grpc.StreamHandler,
+) (err error) {
 	defer func() {
 		e := recover()
 		if e == nil {
@@ -333,7 +379,10 @@ func StreamRecoveryInterceptor(srv interface{}, ss grpc.ServerStream, _ *grpc.St
 // server error response back to return to the client
 func errWithStack(ctx context.Context, err error) *status.Status {
 	stack := debug.Stack()
-	ctxlogrus.Extract(ctx).WithError(err).WithField("stackTrace", string(stack)).Error("panic handling request")
+	ctxlogrus.Extract(ctx).
+		WithError(err).
+		WithField("stackTrace", string(stack)).
+		Error("panic handling request")
 
 	serverError := status.New(codes.Internal, "server error")
 	reqID, _ := uuid.NewV4()

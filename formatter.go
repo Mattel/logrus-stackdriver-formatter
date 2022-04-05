@@ -323,7 +323,8 @@ func (f *Formatter) ToEntry(e *logrus.Entry) (Entry, error) {
 
 		// @type as ReportedErrorEvent if all required fields may be provided
 		// https://cloud.google.com/error-reporting/docs/formatting-error-messages#json_representation
-		if len(message) > 0 && ee.ServiceContext.Service != "" && (ee.StackTrace != "" || ee.SourceLocation != nil) {
+		if len(message) > 0 && ee.ServiceContext.Service != "" &&
+			(ee.StackTrace != "" || ee.SourceLocation != nil) {
 			ee.Type = reportedErrorEventType
 		}
 	}
@@ -347,9 +348,10 @@ func (f *Formatter) ToEntry(e *logrus.Entry) (Entry, error) {
 		delete(ee.Context.Data, "httpRequest")
 	}
 
-	// Promote the httpRequest details to parent entry so logs may be presented with HTTP request details
-	// Only do this when the logging middleware provides special instructions in log entry context to do so,
-	// as the resulting log message summary line is specially formatted to ignore the payload message
+	// Promote the httpRequest details to parent entry so logs may be presented with HTTP request
+	// details Only do this when the logging middleware provides special instructions in log entry
+	// context to do so, as the resulting log message summary line is specially formatted to ignore
+	// the payload message
 	if req, ok := ee.Context.Data["httpRequest"].(requestDetails); ok {
 		ee.HTTPRequest = req.HTTPRequest
 		delete(ee.Context.Data, "httpRequest")

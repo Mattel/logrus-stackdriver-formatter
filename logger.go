@@ -23,12 +23,14 @@ func NewLogrusGoKitLogger(logger logrusLogger) *LogrusGoKitLogger {
 	return &LogrusGoKitLogger{logger}
 }
 
-const msgKey = "msg"
-const messageKey = "message"
-const errKey = "err"
-const errorKey = "error"
-const severityKey = "severity"
-const levelKey = "level"
+const (
+	msgKey      = "msg"
+	messageKey  = "message"
+	errKey      = "err"
+	errorKey    = "error"
+	severityKey = "severity"
+	levelKey    = "level"
+)
 
 // Log implements the fundamental Logger interface
 func (l LogrusGoKitLogger) Log(keyvals ...interface{}) error {
@@ -43,7 +45,9 @@ func (l LogrusGoKitLogger) Log(keyvals ...interface{}) error {
 // extractLogElements iterates through the keyvals to form well
 // structured key:value pairs that Logrus expects. It also checks for keys with
 // special meaning like "msg" and "level" to format the log entry
-func (l LogrusGoKitLogger) extractLogElements(keyVals ...interface{}) (logrus.Fields, logrus.Level, string) {
+func (l LogrusGoKitLogger) extractLogElements(
+	keyVals ...interface{},
+) (logrus.Fields, logrus.Level, string) {
 	msg := ""
 	fields := logrus.Fields{}
 	level := logrus.DebugLevel
